@@ -1,6 +1,7 @@
 ﻿Imports SKYPE4COMLib
 Imports System.Windows.Forms
 Imports System.Net
+Imports System.CodeDom
 
 Module Module1
 
@@ -92,6 +93,12 @@ Module Module1
         Console.WriteLine(" / /_)/  / /\/\  /   / /  / _ \| '_ \/ __|/ _ \| |/ _ \")
         Console.WriteLine("/ ___/  / /   /  \  / /__| (_) | | | \__ \ (_) | |  __/")
         Console.WriteLine("\/      \/   /_/\_\ \____/\___/|_| |_|___/\___/|_|\___|")
+        Console.ForegroundColor = ConsoleColor.DarkGray
+        Console.Write("Loaded ")
+        Console.ForegroundColor = ConsoleColor.Gray
+        Console.Write("4")
+        Console.ForegroundColor = ConsoleColor.DarkGray
+        Console.WriteLine(" Modules!")
         Console.WriteLine(" ")
         Console.ForegroundColor = ConsoleColor.DarkGreen
         Console.WriteLine("PTX Console 1.0 by Jonas")
@@ -111,6 +118,15 @@ Module Module1
                 If Console.ReadLine() = "yes" Then
                     End
                 End If
+            ElseIf s = "mlist" Then
+                Console.ForegroundColor = ConsoleColor.Gray
+                Console.WriteLine("List of modules:")
+                Console.WriteLine(" ")
+                Console.ForegroundColor = ConsoleColor.DarkGray
+                Console.WriteLine("skypeClient")
+                Console.WriteLine("skypeResolver")
+                Console.WriteLine("webServer")
+                Console.WriteLine("compiler")
             ElseIf s = "clear" Then
                 Console.Clear()
             ElseIf s.StartsWith("jump") Then
@@ -230,83 +246,238 @@ Module Module1
                         End If
                     End While
 
-                ElseIf s.Replace("jump ", "") = "skypeResolver" Then
+                ElseIf s.Replace("jump ", "") = "compiler" Then
 
+                    Console.ForegroundColor = ConsoleColor.White
                     Console.ForegroundColor = ConsoleColor.DarkGray
                     Console.Write("Using ")
                     Console.ForegroundColor = ConsoleColor.Cyan
-                    Console.Write("Skype")
+                    Console.Write("VB.NET")
                     Console.ForegroundColor = ConsoleColor.DarkGray
-                    Console.WriteLine(" Resolver library.")
+                    Console.WriteLine(" Compiler library.")
+
+                    Dim importer As New Specialized.StringCollection
+                    Dim dlls As New Specialized.StringCollection
+
+                    importer.Add("System")
+                    importer.Add("Microsoft.VisualBasic")
+
+                    dlls.Add("System.Windows.Forms.dll")
+
+                    Dim code As String = "Module Module1" + vbNewLine + "    Sub Main()" + vbNewLine + "        MsgBox(" + Chr(34) + "Test" + Chr(34) + ")" + vbNewLine + "    End Sub" + vbNewLine + "End Module"
+
                     Dim active As Boolean = True
                     While active
                         Console.ForegroundColor = ConsoleColor.Gray
-                        Console.Write("ptx/skypeResolver:> ")
+                        Console.Write("ptx/compiler:> ")
                         Console.ForegroundColor = ConsoleColor.Yellow
                         Dim l As String = Console.ReadLine()
                         If l = "top" Then
                             active = False
-                        ElseIf l.StartsWith("byname") Then
-                            With New Net.WebClient()
-                                .Headers("User-Agent") = "Skype"
-                                Dim response As String = .DownloadString("http://api.predator.wtf/resolver/?arguments=" + l.Replace("byname ", ""))
-                                If response.Contains("Crap") Or response.Contains("resolved") Then
-                                    response = "Could not resolve person."
-                                    EmitErr(response)
-                                Else
-                                    Console.ForegroundColor = ConsoleColor.Green
-                                    Console.WriteLine(response)
-                                    Console.ForegroundColor = ConsoleColor.Gray
-                                End If
-                            End With
-                        ElseIf l.StartsWith("byip") Then
-                            With New Net.WebClient()
-                                .Headers("User-Agent") = "Skype"
-                                Dim response As String = .DownloadString("http://api.predator.wtf/lookup/?arguments=" + l.Replace("byip ", ""))
-                                If response.Contains("Athena") Or response.Contains("Crap") Or response.Contains("no") Then
-                                    response = "The IP is not bound to a name."
-                                    EmitErr(response)
-                                Else
-                                    Console.ForegroundColor = ConsoleColor.Green
-                                    Console.WriteLine(response)
-                                    Console.ForegroundColor = ConsoleColor.Gray
-                                End If
-                            End With
-                        ElseIf l.StartsWith("geoname") Then
-                            Dim ip As Boolean = False
-                            Dim rip As String = ""
-                            Console.Write("Getting IP... ")
-                            With New Net.WebClient()
-                                .Headers("User-Agent") = "Skype"
-                                Dim response As String = .DownloadString("http://api.predator.wtf/resolver/?arguments=" + l.Replace("geoname ", ""))
-                                If response.Contains("Crap") Or response.Contains("resolved") Then
-                                    ip = False
-                                Else
-                                    ip = True
-                                    rip = response
-                                End If
-                            End With
-                            Console.WriteLine(rip)
-                            Console.WriteLine("Getting GeoData:")
-                            If ip Then
-                                With New Net.WebClient()
-                                    .Headers("User-Agent") = "Skype"
-                                    Dim response As String = .DownloadString("http://api.predator.wtf/geoip/?arguments=" + rip.ToString.Trim)
-                                    Console.ForegroundColor = ConsoleColor.White
-                                    Console.WriteLine(response.Replace("<br>", vbNewLine))
-                                    Console.ForegroundColor = ConsoleColor.Gray
+                        ElseIf l = ("compile") Then
+                            Try
+                                With New IO.StreamWriter("compiletemp.vb")
+                                    For Each i In importer
+                                        .WriteLine("Imports " + i)
+                                    Next
+                                    .WriteLine(code)
+                                    .Flush()
+                                    .Close()
                                 End With
-                            Else
-                                EmitErr("No IP found.")
-                            End If
+
+                                With New VBNetCompiler
+                                    EmitSuccess("Compiler initialized.")
+                                    EmitSuccess("Compiling...")
+                                    For Each d In dlls
+                                        .VBCompilerParameters.ReferencedAssemblies.Add(d)
+                                    Next
+                                    .FilesToCompile.Add("compiletemp.vb")
+                                    .VBCompilerParameters.MainClass = "Module1"
+                                    .VBCompilerParameters.GenerateExecutable = True
+                                    .VBCompilerParameters.OutputAssembly = "out.exe"
+                                    .Compile()
+                                    EmitSuccess("Compiled to 'out.exe'!")
+                                End With
+                            Catch ex As Exception
+                                EmitErr("Compiling error: " + ex.Message)
+                            End Try
+                        ElseIf l = ("run") Then
+                            Try
+                                With New IO.StreamWriter("compiletemp.vb")
+                                    For Each i In importer
+                                        .WriteLine("Imports " + i)
+                                    Next
+                                    .WriteLine(code)
+                                    .Flush()
+                                    .Close()
+                                End With
+
+                                With New VBNetCompiler
+                                    EmitSuccess("Compiler initialized.")
+                                    EmitSuccess("Compiling...")
+                                    For Each d In dlls
+                                        .VBCompilerParameters.ReferencedAssemblies.Add(d)
+                                    Next
+                                    .FilesToCompile.Add("compiletemp.vb")
+                                    .VBCompilerParameters.MainClass = "Module1"
+                                    .VBCompilerParameters.GenerateExecutable = True
+                                    .VBCompilerParameters.OutputAssembly = "tempdebug.exe"
+                                    .Compile()
+                                    EmitSuccess("Compiled to 'tempdebug.exe'!")
+                                    EmitSuccess("Running!")
+                                    Process.Start("tempdebug.exe")
+                                End With
+                            Catch ex As Exception
+                                EmitErr("Compiling error: " + ex.Message)
+                            End Try
+                        ElseIf l = ("importvb") Then
+                            With New OpenFileDialog
+                                AddHandler .FileOk, Sub()
+                                                        code = My.Computer.FileSystem.ReadAllText(.FileName)
+                                                        Console.ForegroundColor = ConsoleColor.White
+                                                        Console.WriteLine("Code imported.")
+                                                    End Sub
+                                .Filter = "VB-File|*.vb"
+                                .Title = "Open VB file"
+                                .ShowDialog()
+                            End With
+                        ElseIf l.StartsWith("import") Then
+                            Console.ForegroundColor = ConsoleColor.White
+                            Console.Write("Imported ")
+                            Console.ForegroundColor = ConsoleColor.Green
+                            Console.Write(l.Replace("import ", ""))
+                            Console.ForegroundColor = ConsoleColor.White
+                            Console.WriteLine("!")
+                            importer.Add(l.Replace("import ", ""))
+                        ElseIf l.StartsWith("remove") Then
+                            Try
+                                importer.Remove(l.Replace("remove ", ""))
+                                Console.ForegroundColor = ConsoleColor.White
+                                Console.Write("Removed ")
+                                Console.ForegroundColor = ConsoleColor.Red
+                                Console.Write(l.Replace("remove ", ""))
+                                Console.ForegroundColor = ConsoleColor.White
+                                Console.WriteLine("!")
+                            Catch ex As Exception
+                                EmitErr("Could not remove!")
+                            End Try
+                        ElseIf l = ("list") Then
+                            Console.ForegroundColor = ConsoleColor.White
+                            Console.WriteLine("IMPORTED MODULES:")
+                            Console.WriteLine(" ")
+                            For Each i In importer
+                                Console.WriteLine(i)
+                            Next
+                        ElseIf l.StartsWith("importdll") Then
+                            Console.ForegroundColor = ConsoleColor.White
+                            Console.Write("Imported ")
+                            Console.ForegroundColor = ConsoleColor.Green
+                            Console.Write(l.Replace("importdll ", ""))
+                            Console.ForegroundColor = ConsoleColor.White
+                            Console.WriteLine("!")
+                            dlls.Add(l.Replace("importdll ", "") + ".dll")
+                        ElseIf l.StartsWith("removedll") Then
+                            Try
+                                dlls.Remove(l.Replace("removedll ", "") + ".dll")
+                                Console.ForegroundColor = ConsoleColor.White
+                                Console.Write("Removed ")
+                                Console.ForegroundColor = ConsoleColor.Red
+                                Console.Write(l.Replace("removedll ", ""))
+                                Console.ForegroundColor = ConsoleColor.White
+                                Console.WriteLine("!")
+                            Catch ex As Exception
+                                EmitErr("Could not remove!")
+                            End Try
+                        ElseIf l = ("listdlls") Then
+                            Console.ForegroundColor = ConsoleColor.White
+                            Console.WriteLine("IMPORTED DLLS:")
+                            Console.WriteLine(" ")
+                            For Each i In dlls
+                                Console.WriteLine(i)
+                            Next
                         End If
                     End While
 
+
+                    Console.ForegroundColor = ConsoleColor.Gray
+
+                ElseIf s.Replace("jump ", "") = "skypeResolver" Then
+
+            Console.ForegroundColor = ConsoleColor.DarkGray
+            Console.Write("Using ")
+            Console.ForegroundColor = ConsoleColor.Cyan
+            Console.Write("Skype")
+            Console.ForegroundColor = ConsoleColor.DarkGray
+            Console.WriteLine(" Resolver library.")
+            Dim active As Boolean = True
+            While active
+                Console.ForegroundColor = ConsoleColor.Gray
+                Console.Write("ptx/skypeResolver:> ")
+                Console.ForegroundColor = ConsoleColor.Yellow
+                Dim l As String = Console.ReadLine()
+                If l = "top" Then
+                    active = False
+                ElseIf l.StartsWith("byname") Then
+                    With New Net.WebClient()
+                        .Headers("User-Agent") = "Skype"
+                        Dim response As String = .DownloadString("http://api.predator.wtf/resolver/?arguments=" + l.Replace("byname ", ""))
+                        If response.Contains("Crap") Or response.Contains("resolved") Then
+                            response = "Could not resolve person."
+                            EmitErr(response)
+                        Else
+                            Console.ForegroundColor = ConsoleColor.Green
+                            Console.WriteLine(response)
+                            Console.ForegroundColor = ConsoleColor.Gray
+                        End If
+                    End With
+                ElseIf l.StartsWith("byip") Then
+                    With New Net.WebClient()
+                        .Headers("User-Agent") = "Skype"
+                        Dim response As String = .DownloadString("http://api.predator.wtf/lookup/?arguments=" + l.Replace("byip ", ""))
+                        If response.Contains("Athena") Or response.Contains("Crap") Or response.Contains("no") Then
+                            response = "The IP is not bound to a name."
+                            EmitErr(response)
+                        Else
+                            Console.ForegroundColor = ConsoleColor.Green
+                            Console.WriteLine(response)
+                            Console.ForegroundColor = ConsoleColor.Gray
+                        End If
+                    End With
+                ElseIf l.StartsWith("geoname") Then
+                    Dim ip As Boolean = False
+                    Dim rip As String = ""
+                    Console.Write("Getting IP... ")
+                    With New Net.WebClient()
+                        .Headers("User-Agent") = "Skype"
+                        Dim response As String = .DownloadString("http://api.predator.wtf/resolver/?arguments=" + l.Replace("geoname ", ""))
+                        If response.Contains("Crap") Or response.Contains("resolved") Then
+                            ip = False
+                        Else
+                            ip = True
+                            rip = response
+                        End If
+                    End With
+                    Console.WriteLine(rip)
+                    Console.WriteLine("Getting GeoData:")
+                    If ip Then
+                        With New Net.WebClient()
+                            .Headers("User-Agent") = "Skype"
+                            Dim response As String = .DownloadString("http://api.predator.wtf/geoip/?arguments=" + rip.ToString.Trim)
+                            Console.ForegroundColor = ConsoleColor.White
+                            Console.WriteLine(response.Replace("<br>", vbNewLine))
+                            Console.ForegroundColor = ConsoleColor.Gray
+                        End With
+                    Else
+                        EmitErr("No IP found.")
+                    End If
+                End If
+            End While
+
                 Else
-                    EmitErr("JUMP: Library not present.")
+            EmitErr("JUMP: Library not present.")
                 End If
             Else
-                EmitErr("Unknown command.")
+            EmitErr("Unknown command.")
             End If
 
             Console.ForegroundColor = ConsoleColor.Gray
@@ -322,6 +493,17 @@ Module Module1
         Console.Write("[")
         Console.ForegroundColor = ConsoleColor.Red
         Console.Write("!")
+        Console.ForegroundColor = ConsoleColor.Gray
+        Console.Write("] ")
+        Console.ForegroundColor = ConsoleColor.White
+        Console.WriteLine(Text)
+    End Sub
+
+    Sub EmitSuccess(Text As String)
+        Console.ForegroundColor = ConsoleColor.Gray
+        Console.Write("[")
+        Console.ForegroundColor = ConsoleColor.Green
+        Console.Write("OK")
         Console.ForegroundColor = ConsoleColor.Gray
         Console.Write("] ")
         Console.ForegroundColor = ConsoleColor.White
