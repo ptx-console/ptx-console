@@ -2,6 +2,7 @@
 Imports System.Windows.Forms
 Imports System.Net
 Imports System.CodeDom
+Imports System.Net.Mail
 
 Module Module1
 
@@ -9,12 +10,88 @@ Module Module1
 
     Sub titlecosmetics()
 
-        Dim a As New Threading.Thread(AddressOf titlecosmeticsthread)
+        Dim a As New Threading.Thread(AddressOf title3)
         a.Start()
 
     End Sub
 
-    Sub titlecosmeticsthread()
+    Sub title2()
+        Dim i As Integer = 0
+        Do
+            If i = 0 Then
+                Console.Title = "PTX CONSOLE"
+                i = 1
+            Else
+                Console.Title = "ptx console"
+                i = 0
+            End If
+            Threading.Thread.Sleep(500)
+        Loop
+    End Sub
+
+    Sub title3()
+        Dim i As Integer = 0
+        Do
+            If i = 0 Then
+                Console.Title = "Ptx console"
+                i = New Random().Next(0, 17)
+            ElseIf i = 1 Then
+                Console.Title = "pTx console"
+                i = New Random().Next(0, 17)
+            ElseIf i = 2 Then
+                Console.Title = "ptX console"
+                i = New Random().Next(0, 17)
+            ElseIf i = 3 Then
+                Console.Title = "ptx Console"
+                i = New Random().Next(0, 17)
+            ElseIf i = 4 Then
+                Console.Title = "ptx cOnsole"
+                i = New Random().Next(0, 17)
+            ElseIf i = 5 Then
+                Console.Title = "ptx coNsole"
+                i = New Random().Next(0, 17)
+            ElseIf i = 6 Then
+                Console.Title = "ptx conSole"
+                i = New Random().Next(0, 17)
+            ElseIf i = 7 Then
+                Console.Title = "ptx consOle"
+                i = New Random().Next(0, 17)
+            ElseIf i = 8 Then
+                Console.Title = "ptx consoLe"
+                i = New Random().Next(0, 17)
+            ElseIf i = 9 Then
+                Console.Title = "ptx consolE"
+                i = New Random().Next(0, 17)
+            ElseIf i = 10 Then
+                Console.Title = "ptx consoLe"
+                i = New Random().Next(0, 17)
+            ElseIf i = 11 Then
+                Console.Title = "ptx consOle"
+                i = New Random().Next(0, 17)
+            ElseIf i = 12 Then
+                Console.Title = "ptx conSole"
+                i = New Random().Next(0, 17)
+            ElseIf i = 13 Then
+                Console.Title = "ptx coNsole"
+                i = New Random().Next(0, 17)
+            ElseIf i = 14 Then
+                Console.Title = "ptx cOnsole"
+                i = New Random().Next(0, 17)
+            ElseIf i = 15 Then
+                Console.Title = "ptx Console"
+                i = New Random().Next(0, 17)
+            ElseIf i = 16 Then
+                Console.Title = "ptX console"
+                i = New Random().Next(0, 17)
+            ElseIf i = 17 Then
+                Console.Title = "pTx console"
+                i = New Random().Next(0, 17)
+            End If
+            Threading.Thread.Sleep(100)
+        Loop
+    End Sub
+
+    Sub title1()
         Dim i As Integer = 0
         Do
             If i = 0 Then
@@ -79,8 +156,8 @@ Module Module1
 #End Region
 
     Dim li As New HttpListener
-
     Dim skype As New Skype
+    Dim spsy As New Speech.Synthesis.SpeechSynthesizer
     Dim skypeAttached As Boolean = False
 
     Sub Main()
@@ -96,7 +173,7 @@ Module Module1
         Console.ForegroundColor = ConsoleColor.DarkGray
         Console.Write("Loaded ")
         Console.ForegroundColor = ConsoleColor.Gray
-        Console.Write("4")
+        Console.Write("7")
         Console.ForegroundColor = ConsoleColor.DarkGray
         Console.WriteLine(" Modules!")
         Console.WriteLine(" ")
@@ -114,7 +191,7 @@ Module Module1
                 Console.Write("yes")
                 Console.ForegroundColor = ConsoleColor.DarkRed
                 Console.Write("' to confirm. ")
-                Console.ForegroundColor = ConsoleColor.Yellow
+                Console.ForegroundColor = ConsoleColor.Red
                 If Console.ReadLine() = "yes" Then
                     End
                 End If
@@ -129,6 +206,14 @@ Module Module1
                 Console.WriteLine("compiler")
             ElseIf s = "clear" Then
                 Console.Clear()
+            ElseIf s = ("ttsgui") Then
+                System.Windows.Forms.Application.Run(New TtsGUI)
+            ElseIf s.StartsWith("say:") Then
+                Console.ForegroundColor = ConsoleColor.White
+                Console.Write("Speaking... ")
+                spsy.Speak(s.Replace("say:", ""))
+                Console.ForegroundColor = ConsoleColor.Green
+                Console.WriteLine("DONE!")
             ElseIf s.StartsWith("jump") Then
                 If s.Replace("jump ", "") = "skypeClient" Then
                     Console.ForegroundColor = ConsoleColor.DarkGray
@@ -401,80 +486,117 @@ Module Module1
 
                     Console.ForegroundColor = ConsoleColor.Gray
 
+                ElseIf s.Replace("jump ", "") = "mail" Then
+
+                    Console.ForegroundColor = ConsoleColor.Gray
+                    Console.Write("Server: ")
+                    Console.ForegroundColor = ConsoleColor.White
+                    Dim msvr As String = Console.ReadLine()
+
+                    Console.ForegroundColor = ConsoleColor.Gray
+                    Console.Write("From: ")
+                    Console.ForegroundColor = ConsoleColor.White
+                    Dim mfrom As String = Console.ReadLine()
+
+                    Console.ForegroundColor = ConsoleColor.Gray
+                    Console.Write("To: ")
+                    Console.ForegroundColor = ConsoleColor.White
+                    Dim mto As String = Console.ReadLine()
+
+                    Console.ForegroundColor = ConsoleColor.Gray
+                    Console.Write("Subject: ")
+                    Console.ForegroundColor = ConsoleColor.White
+                    Dim msubject As String = Console.ReadLine()
+
+                    Console.ForegroundColor = ConsoleColor.Gray
+                    Console.Write("Message: ")
+                    Console.ForegroundColor = ConsoleColor.White
+                    Dim mcont As String = Console.ReadLine()
+
+                    Try
+                        Dim message As New MailMessage(mfrom, mto, msubject, mcont)
+                        Dim emailClient As New SmtpClient(msvr)
+                        emailClient.EnableSsl = True
+                        emailClient.Send(message)
+                        EmitSuccess("Mail sent.")
+                    Catch ex As Exception
+                        EmitErr("Could not send message: " + ex.Message)
+                    End Try
+
                 ElseIf s.Replace("jump ", "") = "skypeResolver" Then
 
-            Console.ForegroundColor = ConsoleColor.DarkGray
-            Console.Write("Using ")
-            Console.ForegroundColor = ConsoleColor.Cyan
-            Console.Write("Skype")
-            Console.ForegroundColor = ConsoleColor.DarkGray
-            Console.WriteLine(" Resolver library.")
-            Dim active As Boolean = True
-            While active
-                Console.ForegroundColor = ConsoleColor.Gray
-                Console.Write("ptx/skypeResolver:> ")
-                Console.ForegroundColor = ConsoleColor.Yellow
-                Dim l As String = Console.ReadLine()
-                If l = "top" Then
-                    active = False
-                ElseIf l.StartsWith("byname") Then
-                    With New Net.WebClient()
-                        .Headers("User-Agent") = "Skype"
-                        Dim response As String = .DownloadString("http://api.predator.wtf/resolver/?arguments=" + l.Replace("byname ", ""))
-                        If response.Contains("Crap") Or response.Contains("resolved") Then
-                            response = "Could not resolve person."
-                            EmitErr(response)
-                        Else
-                            Console.ForegroundColor = ConsoleColor.Green
-                            Console.WriteLine(response)
-                            Console.ForegroundColor = ConsoleColor.Gray
+                    Console.ForegroundColor = ConsoleColor.DarkGray
+                    Console.Write("Using ")
+                    Console.ForegroundColor = ConsoleColor.Cyan
+                    Console.Write("Skype")
+                    Console.ForegroundColor = ConsoleColor.DarkGray
+                    Console.WriteLine(" Resolver library.")
+                    Dim active As Boolean = True
+                    While active
+                        Console.ForegroundColor = ConsoleColor.Gray
+                        Console.Write("ptx/skypeResolver:> ")
+                        Console.ForegroundColor = ConsoleColor.Yellow
+                        Dim l As String = Console.ReadLine()
+                        If l = "top" Then
+                            active = False
+                        ElseIf l.StartsWith("byname") Then
+                            With New Net.WebClient()
+                                .Headers("User-Agent") = "Skype"
+                                Dim response As String = .DownloadString("http://api.predator.wtf/resolver/?arguments=" + l.Replace("byname ", ""))
+                                If response.Contains("Crap") Or response.Contains("resolved") Then
+                                    response = "Could not resolve person."
+                                    EmitErr(response)
+                                Else
+                                    Console.ForegroundColor = ConsoleColor.Green
+                                    Console.WriteLine(response)
+                                    Console.ForegroundColor = ConsoleColor.Gray
+                                End If
+                            End With
+                        ElseIf l.StartsWith("byip") Then
+                            With New Net.WebClient()
+                                .Headers("User-Agent") = "Skype"
+                                Dim response As String = .DownloadString("http://api.predator.wtf/lookup/?arguments=" + l.Replace("byip ", ""))
+                                If response.Contains("Athena") Or response.Contains("Crap") Or response.Contains("no") Then
+                                    response = "The IP is not bound to a name."
+                                    EmitErr(response)
+                                Else
+                                    Console.ForegroundColor = ConsoleColor.Green
+                                    Console.WriteLine(response)
+                                    Console.ForegroundColor = ConsoleColor.Gray
+                                End If
+                            End With
+                        ElseIf l.StartsWith("geoname") Then
+                            Dim ip As Boolean = False
+                            Dim rip As String = ""
+                            Console.Write("Getting IP... ")
+                            With New Net.WebClient()
+                                .Headers("User-Agent") = "Skype"
+                                Dim response As String = .DownloadString("http://api.predator.wtf/resolver/?arguments=" + l.Replace("geoname ", ""))
+                                If response.Contains("Crap") Or response.Contains("resolved") Then
+                                    ip = False
+                                Else
+                                    ip = True
+                                    rip = response
+                                End If
+                            End With
+                            Console.WriteLine(rip)
+                            Console.WriteLine("Getting GeoData:")
+                            If ip Then
+                                With New Net.WebClient()
+                                    .Headers("User-Agent") = "Skype"
+                                    Dim response As String = .DownloadString("http://api.predator.wtf/geoip/?arguments=" + rip.ToString.Trim)
+                                    Console.ForegroundColor = ConsoleColor.White
+                                    Console.WriteLine(response.Replace("<br>", vbNewLine))
+                                    Console.ForegroundColor = ConsoleColor.Gray
+                                End With
+                            Else
+                                EmitErr("No IP found.")
+                            End If
                         End If
-                    End With
-                ElseIf l.StartsWith("byip") Then
-                    With New Net.WebClient()
-                        .Headers("User-Agent") = "Skype"
-                        Dim response As String = .DownloadString("http://api.predator.wtf/lookup/?arguments=" + l.Replace("byip ", ""))
-                        If response.Contains("Athena") Or response.Contains("Crap") Or response.Contains("no") Then
-                            response = "The IP is not bound to a name."
-                            EmitErr(response)
-                        Else
-                            Console.ForegroundColor = ConsoleColor.Green
-                            Console.WriteLine(response)
-                            Console.ForegroundColor = ConsoleColor.Gray
-                        End If
-                    End With
-                ElseIf l.StartsWith("geoname") Then
-                    Dim ip As Boolean = False
-                    Dim rip As String = ""
-                    Console.Write("Getting IP... ")
-                    With New Net.WebClient()
-                        .Headers("User-Agent") = "Skype"
-                        Dim response As String = .DownloadString("http://api.predator.wtf/resolver/?arguments=" + l.Replace("geoname ", ""))
-                        If response.Contains("Crap") Or response.Contains("resolved") Then
-                            ip = False
-                        Else
-                            ip = True
-                            rip = response
-                        End If
-                    End With
-                    Console.WriteLine(rip)
-                    Console.WriteLine("Getting GeoData:")
-                    If ip Then
-                        With New Net.WebClient()
-                            .Headers("User-Agent") = "Skype"
-                            Dim response As String = .DownloadString("http://api.predator.wtf/geoip/?arguments=" + rip.ToString.Trim)
-                            Console.ForegroundColor = ConsoleColor.White
-                            Console.WriteLine(response.Replace("<br>", vbNewLine))
-                            Console.ForegroundColor = ConsoleColor.Gray
-                        End With
-                    Else
-                        EmitErr("No IP found.")
-                    End If
-                End If
-            End While
+                    End While
 
                 Else
-            EmitErr("JUMP: Library not present.")
+                    EmitErr("JUMP: Library not present.")
                 End If
             Else
             EmitErr("Unknown command.")
